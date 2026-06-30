@@ -26,6 +26,9 @@ const epgRoutes = require('./routes/epgRoutes');
 
 const app = express();
 
+// Trust proxy (required when behind Nginx reverse proxy)
+app.set('trust proxy', 1);
+
 // Security
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
