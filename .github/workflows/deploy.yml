@@ -7,30 +7,58 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to VPS
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Deploy VPS
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          timeout: 60s
+          command_timeout: 30m
+          debug: true
           script: |
+            echo "===== Connected ====="
+            whoami
+            hostname
+            pwd
+
+            if [ ! -d "/var/www/haxor-iptv" ]; then
+              echo "Repository not found!"
+              exit 1
+            fi
+
             cd /var/www/haxor-iptv
 
-            git pull
+            echo "===== Git ====="
+            git fetch --all
+            git reset --hard origin/main
 
+            echo "===== Backend ====="
             cd backend
             npm install
 
+            echo "===== Frontend ====="
             cd ../frontend
             npm install
             npm run build
 
+            echo "===== Restart PM2 ====="
             cd ..
 
-            pm2 restart all
+            if pm2 describe haxor-iptv-api > /dev/null; then
+              pm2 restart haxor-iptv-api
+            else
+              pm2 start ecosystem.config.js
+            fi
+
+            pm2 save
+
+            echo "===== Finished ====="
