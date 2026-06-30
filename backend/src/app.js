@@ -72,8 +72,11 @@ app.use(compression());
 if (config.env !== 'production') {
   app.use(morgan('dev'));
 } else {
+  const logDir = config.log.dir || path.join(__dirname, '../logs');
+  if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+  
   const accessLogStream = fs.createWriteStream(
-    path.join(config.log.dir, 'access.log'),
+    path.join(logDir, 'access.log'),
     { flags: 'a' }
   );
   app.use(morgan('combined', { stream: accessLogStream }));
