@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: haxor-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-HaxorIPTV_Root_2024!}
+      MYSQL_DATABASE: ${DB_NAME:-haxor_iptv}
+      MYSQL_USER: ${DB_USER:-haxor}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-HaxorIPTV_Secure_2024!}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    ports:
+      - "127.0.0.1:3306:3306"
+    networks:
+      - haxor-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: haxor-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: production
+      DB_HOST: mariadb
+      DB_PORT: 3306
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    ports:
+      - "127.0.0.1:5000:5000"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - haxor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: haxor-frontend
+    restart: always
+    ports:
+      - "127.0.0.1:3000:80"
+    depends_on:
+      - backend
+    networks:
+      - haxor-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: haxor-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/haxor-iptv.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - haxor-network
+
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  haxor-network:
+    driver: bridge

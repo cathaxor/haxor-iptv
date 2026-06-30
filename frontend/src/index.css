@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #020617;
+    color: #e2e8f0;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.5);
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.4);
+    color: white;
+  }
+
+  input, textarea, select {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(99, 102, 241, 0.1);
+  }
+
+  .glass-card {
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(99, 102, 241, 0.08);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 50%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-border {
+    position: relative;
+    border: none;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .btn-primary {
+    @apply px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-medium
+           rounded-xl hover:from-primary-500 hover:to-primary-400 transition-all duration-300
+           shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2.5 bg-surface-800 text-surface-200 font-medium rounded-xl
+           border border-surface-700 hover:bg-surface-700 hover:border-surface-600
+           transition-all duration-300 active:scale-[0.98];
+  }
+
+  .btn-danger {
+    @apply px-6 py-2.5 bg-red-600/20 text-red-400 font-medium rounded-xl
+           border border-red-500/20 hover:bg-red-600/30 hover:border-red-500/40
+           transition-all duration-300 active:scale-[0.98];
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-surface-900/50 border border-surface-700/50 rounded-xl
+           text-white placeholder-surface-500 focus:outline-none focus:border-primary-500/50
+           focus:ring-2 focus:ring-primary-500/20 transition-all duration-300;
+  }
+
+  .channel-card {
+    @apply relative flex items-center gap-4 p-3 rounded-xl cursor-pointer
+           transition-all duration-300 hover:bg-surface-800/60;
+  }
+
+  .channel-card.active {
+    @apply bg-primary-600/10 border border-primary-500/20;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-surface-400
+           hover:text-white hover:bg-surface-800/60 transition-all duration-300;
+  }
+
+  .sidebar-link.active {
+    @apply text-white bg-primary-600/15 border border-primary-500/10;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-live {
+    @apply bg-red-500/20 text-red-400 border border-red-500/20;
+  }
+
+  .badge-quality {
+    @apply bg-primary-500/20 text-primary-300 border border-primary-500/20;
+  }
+
+  .shimmer-loading {
+    background: linear-gradient(90deg, rgba(30,41,59,0.3) 25%, rgba(30,41,59,0.6) 50%, rgba(30,41,59,0.3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
